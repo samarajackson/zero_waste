@@ -78,14 +78,19 @@ def success(request):
             elif monthlytrash[key]==None:
                 amounts.append(0.00)
         #after I add everything then we need to get the average and percents etc.
-        average = average/count
-        percent = Decimal(((136.4-average)/136.4) *100).quantize(Decimal('0')) #this is the value for the average american's waste output per month
+        if count >0:
+            average = average/count
+            percent = Decimal(((136.4-average)/136.4) *100).quantize(Decimal('0')) #this is the value for the average american's waste output per month
+        else:
+            percent = 0
         #need to check to change the phrasing of percentages
         if percent > 0:
-            percentstring = f"{percent}% less"
+            percentstring = f"You create {percent}% less trash than the average American."
+        elif percent==0:
+            percentstring = f"Start tracking your waste to see how you compare to the average American!"
         else: 
             percent = percent *-1
-            percentstring = f"{percent}% more"
+            percentstring = f"You create {percent}% more trash than the average American."
         #now want to set what badges show up on the user's profile
         badges = Badge.objects.filter(user=user).order_by("earned_on").reverse()
         for badge in badges:
