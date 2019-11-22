@@ -50,11 +50,11 @@
     </header>
     <div class="container">
         <div class="row">
-            <div class="col pad">
-                <h2>Login</h2>
+            <div class="col-sm-5 pad">
+                <h4>Login</h4>
                 {% if error %}
-                <ul class="messages">
-                    <li>{{error}}</li>
+                <ul class="messages list-group-flush">
+                    <li class="list-group-item">{{error}}</li>
                 </ul>
                 {% endif %}
                 <form action="user_login" method="POST" class="form-signin">
@@ -72,12 +72,12 @@
                     </div>
                 </form>
             </div>
-            <div class="col pads">
-                <h2>Register</h2>
+            <div class="col-sm-5 pad">
+                <h4>Register</h4>
                 {% if messages %}
-                <ul class="messages">
+                <ul class="messages list-group-flush">
                     {% for message in messages %}
-                    <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                    <li {% if message.tags %} class="{{ message.tags }} list-group-item" {% endif %}>{{ message }}</li>
                     {% endfor %}
                 </ul>
                 {% endif %}
