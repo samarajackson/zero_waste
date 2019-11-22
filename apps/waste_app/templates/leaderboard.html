@@ -76,7 +76,7 @@
   <div class="container">
     <div class='row'>
       <div class="col">
-        <h2>This Month's Leaderboard</h2>
+        <h4>This Month's Leaderboard</h4>
         <table class="table table-striped">
           <thead>
             <tr>
@@ -88,7 +88,16 @@
           <tbody>
             {% for value in topmonth %}
             <tr>
-              <th scope="row">{{forloop.counter}}</th>
+              <th scope="row">
+                  {%if forloop.counter == 1 %}
+                  <img src="../static/first.png" width=25 height=25>
+                  {%elif forloop.counter == 2%}
+                  <img src="../static/second.png" width=25 height=25>
+                  {% elif forloop.counter == 3%}
+                  <img src="../static/third.png" width=28>
+                  {% else %}
+                  {{forloop.counter}}
+                  {% endif %}</th>
               <td>{{value.user__username}}</td>
               <td>{{value.weight__sum}}</td>
             </tr>
@@ -97,7 +106,7 @@
         </table>
       </div>
       <div class="col">
-        <h2>Annual Leaderboard</h2>
+        <h4>Annual Leaderboard</h4>
         <table class="table table-striped">
           <thead>
             <tr>
@@ -109,7 +118,17 @@
           <tbody>
             {% for user in topyear %}
             <tr>
-              <th scope="row">{{forloop.counter}}</th>
+              <th scope="row">
+                {%if forloop.counter == 1 %}
+                <img src="../static/first.png" width=25 height=25>
+                {%elif forloop.counter == 2%}
+                <img src="../static/second.png" width=25 height=25>
+                {% elif forloop.counter == 3%}
+                <img src="../static/third.png" width=28>
+                {% else %}
+                {{forloop.counter}}
+                {% endif %}
+              </th>
               <td>{{user.username}}</td>
               <td>{{user.average|floatformat:2}}</td>
             </tr>

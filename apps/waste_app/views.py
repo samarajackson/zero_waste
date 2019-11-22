@@ -12,7 +12,7 @@ def index(request):
     year = datetime.now().year
     # topmonth = Trash.objects.filter(takeout_date__month=month).values('user').annotate(Sum('weight'))
     topmonth = Trash.objects.values('user__username').annotate(Sum('weight')).filter(takeout_date__year=year).filter(takeout_date__month=month)
-    topmonth = topmonth.order_by("weight__sum")
+    topmonth = topmonth.order_by("weight__sum")[:5]
     topyear = Trash.objects.raw("Select id, AVG(total) as average, username FROM (select strftime('%m', takeout_date) as Month, user.id as id, user.username, SUM(weight) as total from waste_app_trash trash, waste_app_user user where trash.user_id = user.id group by username, user.id, strftime('%m', takeout_date) )  group by username order by AVG(total) LIMIT 5")
     if "userid" in request.session:
         user = "userid"
