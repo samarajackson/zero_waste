@@ -35,7 +35,7 @@ def register(request):
         #if there are any problems with the request then this will list all fo the errors
         for key, value in errors.items():
             messages.error(request, value)
-        return redirect("/")
+        return redirect("/login")
     else:
         first_name = request.POST["first"]
         last = request.POST["last"]
