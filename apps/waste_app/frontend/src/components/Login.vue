@@ -6,7 +6,7 @@
     </div>
     <div class="container">
     <b-form @submit="login">
-        <input type="hidden" name="_token" :value="csrf">
+        <!-- <input type="hidden" name="_token" :value="csrf"> -->
         <b-form-group id="email-group"
             label="Email address"
             label-for="email"
@@ -60,11 +60,12 @@ export default {
         this.errors = {}
         if (response.data.errors) {
           this.errors = response.data.errors
+          console.log('there were errors')
         } else {
           this.$store.commit('changeid', response.data.userid)
           this.$store.commit('updateuser', response.data.user)
           this.$cookies.set('userid', response.data.userid)
-          this.$router.replace({ path: './../dashboard' })
+          this.$router.push({ path: 'dashboard' })
         }
       })
     }

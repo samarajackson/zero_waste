@@ -13,6 +13,7 @@ from rest_framework.decorators import api_view, action
 from .serializers import UserSerializer, TrashSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
+from django.middleware.csrf import get_token
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -29,6 +30,8 @@ class TrashViewSet(viewsets.ModelViewSet):
     serializer_class = TrashSerializer
     def create(self, request,*args, **kwargs):
         request.data['user'] = request.COOKIES["userid"]
+        print('userid is: ')
+        print(request.COOKIES['userid'])
         return super().create(request, *args, **kwargs)
 
 class MonthlyLeaderboardView(views.APIView):
@@ -96,6 +99,7 @@ def my_dashboard(request):
         trash_list = []
         x = []
         y = []
+        
         # data modification
         for trash in all_my_trash:
             all_my_trash_month = trash.takeout_date.strftime('%b')
@@ -105,7 +109,7 @@ def my_dashboard(request):
                 monthlytrash[all_my_trash_month] = float(trash.weight)
             else:
                 monthlytrash[all_my_trash_month]+= float(trash.weight)
-            if trash.trashtype == "Zero Waste Week!":
+            if trash.trashtype == "Zero Waste":
                 zerowaste += 1
         
         #calculate the average amount per active month
@@ -134,7 +138,6 @@ def my_dashboard(request):
             # "badges": badges
         }
         response = JsonResponse(context)
-        response['Access-Control-Allow-Credentials'] = 'true'
         return response
     else:
         return HttpResponse({"error":"oops"})
@@ -144,7 +147,6 @@ def login(request):
     """
     This endpoint handles a login from the login page.
     """
-    print(f"login view: {request.data}")
     data = request.data
     email = data['email']
     context = {}
@@ -168,29 +170,11 @@ def login(request):
         }
     request.session.set_test_cookie()
     print(f"session after login: {request.session.items()}")
-    
     return Response(context)
 
-def zero_waste(request):
-    #this is the button to mark that you did not create any waste this week.
-    user = User.objects.get(id=request.session["userid"])
-    date = datetime.now().strftime('%Y-%m-%d')
-    postData = {
-    "user":user,
-    "dateout":date,
-    "bag":"0",
-    "full":"0",
-    "weight":"0",
-    "trashtype":"Zero Waste Week!" }
-    errors = Trash.objects.basic_validator(postData)
-
-    if len(errors) >0:
-        for key, value in errors.items():
-            messages.error(request, value)
-        return redirect("/trash")
-    else:
-        trash = Trash.objects.create(user=user,takeout_date=date,bag_size=0,fullness=0,weight=0,trashtype="Zero Waste Week!")
-        return redirect("/dashboard")
+def logout(request):
+    request.session.flush()
+    return Response({'logged_out':True})
 
 def get_user_data(request):
     user = {}
@@ -207,4 +191,7 @@ def deltrash(request, trash_id):
     else:
         return redirect("/")
 
-
+def get_csrf(request):
+    token = get_token(request)
+    print(token)
+    return JsonResponse({'token': token})

@@ -10,10 +10,14 @@
         <div class="row text-center">
             <div class="col-sm">
             <h4 class="text-center">My Badges</h4>
+            <div v-if="badges==undefined">
+              <img src='../../static/sad.png' width=50 class='m-2'>
+              <p>No badges, yet! Try to reduce your trash!</p>
+            </div>
           </div>
         </div>
         <div class='row'>
-          <div class="col">
+          <div class="col" v-if="data!=undefined">
             <Plotly :data="mydata" :layout="layout" :display-mode-bar="false" class="history"></Plotly>
           </div>
         </div>
@@ -25,15 +29,17 @@
             </div>
         </div> -->
     <div class="row text-center">
-      <h4>My Recent Trashbags </h4>
-      <b-table striped :items="trash" :fields="fields">
-        <template v-slot:cell(type)="trash">
-             <img :src="trash.item.type" width=25 height=25>
-        </template>
-        <template v-slot:cell(id)="trash">
-          <b-button @click="delete(trash.item.id)"><img src="../../static/remove.png" width=25 height=25></b-button>
-        </template>
-      </b-table>
+      <div class="col">
+        <h4>My Recent Trashbags </h4>
+        <b-table striped :items="trash" :fields="fields" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc">
+          <template v-slot:cell(type)="trash">
+              <img :src="trash.item.type" width=25 height=25>
+          </template>
+          <template v-slot:cell(id)="trash">
+            <b-button @click="delete(trash.item.id)"><img src="../../static/remove.png" width=25 height=25></b-button>
+          </template>
+        </b-table>
+      </div>
     </div>
     </div>
 </div>
@@ -52,6 +58,7 @@ export default {
       badges: {},
       percent: 0,
       mydata: [],
+      data: [],
       trash: null,
       zerowasteweeks: 0,
       fields: [{ key: 'date', label: 'Date' },
@@ -61,7 +68,9 @@ export default {
         { key: 'id', label: 'Delete' }],
       layout: {
         title: 'My Progress'
-      }
+      },
+      sortBy: 'date',
+      sortDesc: true,
     }
   },
   methods: {
@@ -70,6 +79,8 @@ export default {
         const data = response.data
         this.badges = data.badges
         let percent = data.percent
+        this.data = data.amounts
+        console.log("data amounts: "+data.amounts)
         this.mydata = [{
           x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
           y: data.amounts,
@@ -81,7 +92,7 @@ export default {
         console.log(this.mydata)
         this.user = data.user
         let text = ''
-        if (parseFloat(percent) === 0) {
+        if (parseFloat(percent) === 0 || percent === undefined) {
           this.percent = 'Start tracking your waste to see how you compare to the average American!'
         } else if (parseFloat(percent) < 0) {
           percent = percent * -1
@@ -97,15 +108,17 @@ export default {
           }
           this.badges.push({ desc: text, link: '../../static/reward.png' })
         }
-        for (let i = 0; i < data.mytrash.length; i++) {
-          const trash = data.mytrash[i]
-          if (parseFloat(trash.weight) > 0) {
-            trash.type = '../../static/trash.png'
-          } else {
-            trash.type = '../../static/reward.png'
+        if ( data.mytrash ){
+          for (let i = 0; i < data.mytrash.length; i++) {
+            const trash = data.mytrash[i]
+            if (parseFloat(trash.weight) > 0) {
+              trash.type = '../../static/trash.png'
+            } else {
+              trash.type = '../../static/reward.png'
+            }
           }
+          this.trash = data.mytrash
         }
-        this.trash = data.mytrash
       })
     },
     async delete (id) {
