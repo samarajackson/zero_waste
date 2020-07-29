@@ -1,0 +1,24 @@
+.messages {
+  color: crimson;
+}
+
+.pad {
+  padding: 4%;
+}
+
+.nav-link:hover{
+  color:#9f55ad !important;
+}
+
+.btn-info{
+  background-color:#9f55ad;
+  border-color:#9f55ad;
+}
+
+.btn-info:hover{
+  background-color:#65376e;
+}
+
+#history{
+  height:400px;
+}
