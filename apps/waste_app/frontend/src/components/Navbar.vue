@@ -23,13 +23,16 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   methods: {
-    logout () {
-      this.$store.commit('changeid', null)
-      this.$store.commit('updateuser', null)
-      this.$cookies.remove('userid')
-      this.$router.replace({path: '/'})
+    async logout () {
+      await axios.get('logout').then((response) => {
+        this.$store.commit('changeid', null)
+        this.$store.commit('updateuser', null)
+        this.$cookies.set('loggedin', false)
+        this.$router.replace({path: '/'})
+      })
     }
   }
 }

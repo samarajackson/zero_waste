@@ -24,6 +24,7 @@ SECRET_KEY = "&yil-e1%f*3q2_ajxo9*8%9$fgq-isd^#qggbc%i@8_9))*p_b"
 DEBUG = True
 AUTH_USER_MODEL = "waste_app.User"
 ALLOWED_HOSTS = []
+# todo add back when we turn on cors stuff
 # CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_WHITELIST = [
 #     "http://127.0.0.1:8080",
@@ -33,7 +34,8 @@ ALLOWED_HOSTS = []
 #     ]
 # Application definition
 CORS_REPLACE_HTTPS_REFERER = True
-#
+
+# todo add back when we turn on cors stuff
 # CORS_ALLOW_HEADERS = [
 #     'x-csrf-token',
 #     'x-requested-with',
@@ -46,28 +48,23 @@ REST_FRAMEWORK = {
 }
 INSTALLED_APPS = [
     "apps.waste_app",
+    # todo add back when we turn on cors stuff
     # 'corsheaders',
-    # 'django.contrib.admin',
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
-    # 'django.contrib.messages',
     "django.contrib.staticfiles",
     "rest_framework",
 ]
 
 MIDDLEWARE = [
     "apps.waste_app.cors.CorsMiddleware",
-    # 'corsheaders.middleware.CorsMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    #'django.middleware.csrf.CsrfViewMiddleware',
-    # 'corsheaders.middleware.CorsPostCsrfMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     "django.contrib.auth.middleware.AuthenticationMiddleware",
-    # 'django.contrib.messages.middleware.MessageMiddleware',
-    # 'apps.waste_app.middleware.MyAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = "zero_waste.urls"
@@ -96,6 +93,24 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
+
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/

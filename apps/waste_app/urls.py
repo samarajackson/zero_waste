@@ -18,5 +18,6 @@ urlpatterns = [
     url(r"^annualleaderboard", views.annual_leaderboard),
     url(r"^mydashboard", views.my_dashboard),
     url(r"^login$", views.login),
+    url(r"^logout$", views.logout),
     url(r"^", include(router.urls)),
 ]

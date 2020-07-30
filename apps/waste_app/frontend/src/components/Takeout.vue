@@ -128,10 +128,10 @@ export default {
     const mm = String(today.getMonth() + 1).padStart(2, '0')
     const yyyy = today.getFullYear()
     this.trashtest.takeout_date = yyyy + '-' + mm + '-' + dd
-    // now to set the csrf token from Django
-    // axios.get('getcsrf').then((response) => {
-    //   this.csrf = response.data.token
-    // })
+    //  TO DO: look into vue.js middleware
+    if (!this.$cookies.get('loggedin')) {
+      this.$router.replace({path: '/'})
+    }
   }
 }
 </script>

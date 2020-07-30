@@ -24,6 +24,7 @@ export default {
     async getRankingsData () {
       await axios.get(this.unit.api).then((response) => {
         const data = response.data
+        // Adding special icons to first through third place
         const rankinglinks = ['../../static/first.png', '../../static/second.png', '../../static/third.png']
         for (let i = 0; i < data.length; i++) {
           if (i <= 2) {

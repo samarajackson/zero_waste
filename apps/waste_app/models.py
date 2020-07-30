@@ -2,7 +2,6 @@ from enum import Enum
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models.signals import pre_save
 
 
 class User(AbstractUser):
@@ -12,7 +11,7 @@ class User(AbstractUser):
 
     bday = models.DateField(null=False)
     # todo my_badges
-    #  todo my_trash
+    # todo my_trash
 
 
 class Trash(models.Model):
@@ -43,13 +42,6 @@ class Trash(models.Model):
     def __repr__(self):
         return f"Trash, takeout date: {self.takeout_date} from user {self.user}"
 
-    @staticmethod
-    def pre_save_validation(sender, instance, *args, **kwargs):
-        pass
-
-
-pre_save.connect(Trash.pre_save_validation, sender=Trash)
-
 
 class Badge(models.Model):
     """
@@ -59,3 +51,4 @@ class Badge(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="my_badges")
     badge = models.CharField(max_length=180)
     earned_on = models.DateField()
+    rank = models.IntegerField()

@@ -7,7 +7,9 @@ from datetime import timedelta
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "first_name", "last_name", "email", "bday"]
+        fields = ["id", "username", "first_name", "last_name", "email", "bday", "password"]
+
+    password = serializers.CharField(write_only=True)
 
     def validate_bday(self, value):
         now = datetime.now()
@@ -18,13 +20,17 @@ class UserSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def create(self, validated_data):
+        print(f"create_user Called with {validated_data}")
+        return User.objects.create_user(**validated_data)
+
 
 class TrashSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trash
         fields = ["user", "takeout_date", "bag_size", "fullness", "weight", "trashtype"]
 
-    user = serializers.IntegerField(default=serializers.CurrentUserDefault())
+    user = serializers.CharField(default=serializers.CurrentUserDefault())
 
     def validate(self, data):
         now = datetime.now()
@@ -48,6 +54,9 @@ class TrashSerializer(serializers.ModelSerializer):
                 .filter(takeout_date__range=(start_of_week, end_of_week))
                 .filter(trashtype="Zero Waste")
             )
+            print(f"all: {allmytrash}")
+            print(start_of_week)
+            print(end_of_week)
             if allmytrash:
                 raise serializers.ValidationError(
                     "This week was already marked as a zero waste week."

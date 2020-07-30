@@ -13,7 +13,6 @@
             type="text"
         ></b-form-input>
         <b-form-text v-if="errors.first_name" force-show=true class="error">
-            erorrrrr
             <div v-for="error in errors.first_name" :key="error">
                 {{error}}
             </div>
@@ -122,10 +121,10 @@ export default {
     async register (data) {
       this.errors = {}
       axios.post('user/', this.user).then((response) => {
-        console.log('then executed:')
-        this.$router.replace({ path: './../dashboard' })
+        this.$store.commit('changeid', response.id)
+        this.$cookies.set('loggedin', true)
+        this.$router.push({ path: '/dashboard' })
       }).catch(error => {
-        console.log('got an error:' + error)
         this.errors = error.response.data
       })
     }
@@ -133,5 +132,7 @@ export default {
 }
 </script>
 <style scoped>
-
+.error {
+    font: red;
+}
 </style>

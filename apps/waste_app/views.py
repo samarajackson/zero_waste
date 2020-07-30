@@ -1,6 +1,6 @@
 from django.http import JsonResponse
-from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.exceptions import AuthenticationFailed, APIException, NotAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 
 from .models import Trash, Badge
 from datetime import datetime
@@ -10,7 +10,7 @@ from decimal import Decimal
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from .serializers import UserSerializer
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 
 
 @api_view(["GET"])
@@ -60,17 +60,23 @@ def annual_leaderboard(request):
     for row in top_for_year:
         # todo rename response format keys
         response_list.append(
-            {"user__username": row.username, "weight__sum": row.average}
+            {"user__username": row.username, "weight__sum": round(row.average,2)}
         )
     return JsonResponse(response_list, safe=False)
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def my_dashboard(request):
     """
     This gets all of the data for the logged in user to send for the user's dashboard.
     """
+    if not request.user.is_authenticated:
+        # todo find a way to do this with permission class or fix on the front end, context:
+        # options call is not sending the cookie after login so using IsAuthenticated returns a 403
+        # and we get a CORS not happy with a non-ok status, but later calls function ok.
+        # not ideal, but the workaround end effect is the same
+        raise NotAuthenticated()
     all_my_trash = Trash.objects.filter(user=request.user).order_by("takeout_date")
     badges = Badge.objects.filter(user=request.user).order_by("earned_on").reverse()
 
@@ -95,7 +101,8 @@ def my_dashboard(request):
     zerowaste = 0
     percent = 0
     trash_list = []
-
+    check = []
+    mybadges = []
     # data modification
     for trash in all_my_trash:
         all_my_trash_month = trash.takeout_date.strftime("%b")
@@ -121,9 +128,15 @@ def my_dashboard(request):
             average += monthlytrash[month]
             count += 1
             amounts.append(monthlytrash[month])
-        elif amount == None:
+            check.append(monthlytrash[month])
+        else:
             amounts.append(0)
-
+    for badge in badges:
+        mybadge = {
+            "text": badge.badge,
+            "rank": badge.rank
+        }
+        mybadges.append(mybadge)
     # after I add everything then we need to get the average and percents etc.
     if (
         count > 0
@@ -134,14 +147,15 @@ def my_dashboard(request):
         percent = Decimal(((136.4 - average) / 136.4) * 100).quantize(Decimal("0"))
 
     context = {
-        "user": request.user.first,
+        "user": request.user.first_name,
         "monthlytrash": monthlytrash,
         "amounts": amounts,
         "percent": percent,
         "average": average,
         "zerowasteweeks": zerowaste,
         "mytrash": trash_list,
-        # "badges": badges
+        "check": check,
+        "badges": mybadges
     }
     response = JsonResponse(context)
     return response
@@ -154,21 +168,21 @@ def login(request):
     This endpoint handles a login from the login page.
     """
     data = request.data
-    username = data["email"]
+    # todo, technically this requires username for login
+    email = data["email"]
     password = data["password"]
-
-    user = authenticate(request, username=username, password=password)
+    # todo change django username field to be username so we don't need both
+    user = authenticate(request=request, username=email, password=password)
     if user is None:
         raise AuthenticationFailed(detail="Invalid Credentials")
-
-    login(request, user)
+    django_login(request, user)
 
     return Response(UserSerializer(user).data)
 
 
-@api_view(["POST"])
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def logout(request):
     """log a user out"""
-    logout(request)
+    django_logout(request)
     return Response()

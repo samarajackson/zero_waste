@@ -27,7 +27,8 @@ class IsUser(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        if not hasattr(obj, "user"):
+        print("in has_object_permission")
+        if not hasattr(obj, "user") and obj.user:
             raise ValueError(
                 "Programming Error: IsUsers can only be used on model with a user col"
             )
