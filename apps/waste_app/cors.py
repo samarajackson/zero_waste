@@ -1,5 +1,6 @@
 class CorsMiddleware(object):
     def process_response(self, response):
+        print('proc res')
         response["Access-Control-Allow-Origin"] = "http://localhost:8080"
         response['Access-Control-Allow-Credentials'] = 'true'
         response["Access-Control-Allow-Methods"] = "GET,HEAD,OPTIONS,POST,PUT"
@@ -7,12 +8,16 @@ class CorsMiddleware(object):
         return response
     def __init__(self, get_response):
         self.get_response = get_response
+        
         # One-time configuration and initialization.
 
     def __call__(self, request):
         # Code to be executed for each request before
         # the view (and later middleware) are called.
+        print('called call')
         response = self.get_response(request)
+
         # Code to be executed for each request/response after
         # the view is called.
+
         return self.process_response(response)

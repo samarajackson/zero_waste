@@ -29,7 +29,6 @@ export default {
       this.$store.commit('changeid', null)
       this.$store.commit('updateuser', null)
       this.$cookies.remove('userid')
-      
       this.$router.replace({ path: '/' })
     }
   }
