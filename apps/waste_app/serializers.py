@@ -1,72 +1,60 @@
-from rest_framework import serializers, validators
+from rest_framework import serializers
 from .models import User, Trash
-import bcrypt, copy
-from datetime import datetime
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
 from datetime import datetime
 from datetime import timedelta
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
-    # def validate_first_name(self, value):
-    #     if len(value) < 2:
-    #         raise serializers.ValidationError("First name should be at least 2 characters")
-    #     return value
-    # def validate_last_name(self,value):
-    #     if len(value) < 2:
-    #         raise serializers.ValidationError("Last name should be at least 2 characters")
-    #     return value
-    # def validate_username(self,value):
-    #     if not value:
-    #         raise serializers.ValidationError("A username must be provided")
-    #     return value
-    def validate_bday(self,value):
-        if not value:
-            raise serializers.ValidationError("Birthday is a required field")
-        return value
-    def validate_password(self,value):
-        pw = bcrypt.hashpw(value.encode(), bcrypt.gensalt())
-        pw = pw.decode()
-        return value
-    def validate_bday(self,value):
+        fields = ["id", "username", "first_name", "last_name", "email", "bday"]
+
+    def validate_bday(self, value):
         now = datetime.now()
         maxdate = now.replace(year=now.year - 13).date()
         if maxdate <= value:
-            raise serializers.ValidationError("You must be at least 13 years old to register")
+            raise serializers.ValidationError(
+                "You must be at least 13 years old to register"
+            )
         return value
-    # def validate_email(self,value):
-    #     if User.objects.filter(email=value):
-    #         raise serializers.ValidationError("Email address is already in use for an existing account")
-    #     try:
-    #         validate_email(value)
-    #     except ValidationError:
-    #         raise serializers.ValidationError("Invalid email")
-        # return value
-        
+
+
 class TrashSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trash
-        fields = ['user','takeout_date','bag_size','fullness','weight','trashtype']
-    def validate(self,data):
-        print('called validate')
+        fields = ["user", "takeout_date", "bag_size", "fullness", "weight", "trashtype"]
+
+    user = serializers.IntegerField(default=serializers.CurrentUserDefault())
+
+    def validate(self, data):
         now = datetime.now()
         start_of_week = now - timedelta(days=now.weekday())
         end_of_week = start_of_week + timedelta(days=6)
-        user = data['user']
-        if data["trashtype"]=='Zero Waste':
-            allmytrash = Trash.objects.filter(user=user).filter(takeout_date__range = (start_of_week,end_of_week)).filter(weight > 0)
+        user = data["user"]
+        if data["trashtype"] == "Zero Waste":
+            allmytrash = (
+                Trash.objects.filter(user=user)
+                .filter(takeout_date__range=(start_of_week, end_of_week))
+                .filter(weight__gt=0)
+            )
             if allmytrash:
-                raise serializers.ValidationError("There is already trash entered for this week, so it can't be marked as a zero waste week.")
-        elif data["trashtype"] == 'Trashbag':
-            allmytrash= Trash.objects.filter(user=user).filter(takeout_date__range=(start_of_week,end_of_week)).filter(trashtype="Zero Waste")
+                raise serializers.ValidationError(
+                    "There is already trash entered for this week, "
+                    "so it can't be marked as a zero waste week."
+                )
+        elif data["trashtype"] == "Trashbag":
+            allmytrash = (
+                Trash.objects.filter(user=user)
+                .filter(takeout_date__range=(start_of_week, end_of_week))
+                .filter(trashtype="Zero Waste")
+            )
             if allmytrash:
-                raise serializers.ValidationError("This week was already marked as a zero waste week.")
+                raise serializers.ValidationError(
+                    "This week was already marked as a zero waste week."
+                )
         return data
-    def validate_takeout_date(self,value):
-        print('called this one')
+
+    def validate_takeout_date(self, value):
         now = datetime.now().date()
         if not value:
             raise serializers.ValidationError("A takeout date must be included")
@@ -74,7 +62,11 @@ class TrashSerializer(serializers.ModelSerializer):
             delta = now - value
             delta = delta.days
             if delta > 500:
-                raise serializers.ValidationError("Trash can only be taken out within the week.")
+                raise serializers.ValidationError(
+                    "Trash can only be taken out within the week."
+                )
             elif delta < 0:
-                raise serializers.ValidationError("You can only add trash that has already been taken out.")
+                raise serializers.ValidationError(
+                    "You can only add trash that has already been taken out."
+                )
         return value
