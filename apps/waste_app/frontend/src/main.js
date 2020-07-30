@@ -10,13 +10,17 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import { store } from './store/store'
 import VueCookies from 'vue-cookies'
 
+// vue cookies settings
 Vue.use(VueCookies)
 Vue.$cookies.config('7d')
-// import VueAxios from 'vue-axios'
-
 Vue.config.productionTip = false
 
+// Axios Config settings
 axios.defaults.baseURL = 'http://localhost:8000/'
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+axios.defaults.withCredentials = true
+
 // Install BootstrapVue
 Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin

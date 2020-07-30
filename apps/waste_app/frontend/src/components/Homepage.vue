@@ -2,24 +2,27 @@
 <div>
     <div class="jumbotron">
       <h1 class="display-4"> Welcome to Trash<img src="../../static/coldel.png" alt="Trash Icon" height=70 class="pb-2">Track </h1>
-      <p class="lead">Track your waste production, compete with others, and earn achievements! View the top performing
+      <p class="lead">Track your waste production, compete with others, and earn achievements!</p>
+      <p class="lead">View the top performing
         users below!</p>
     </div>
+    <div class="container">
     <div class="Leaderboard row">
-        <div class="table col">
+      <div class="lbtable col">
+        <Leaderboard v-bind:unit="{
+          'api': 'annualleaderboard',
+          'title': 'This Year\'s Leaderboard',
+          'weight':'Average Waste'
+        }"/>
+      </div>
+      <div class="lbtable col">
         <Leaderboard v-bind:unit="{
           'api': 'monthlyleaderboard',
           'title': 'This Month\'s Leaderboard',
           'weight':'Waste Landfilled'
         }"/>
-        </div>
-        <div class="lbtable col">
-        <Leaderboard v-bind:unit="{
-          'api': 'annualleaderboard',
-          'title': 'This Year\'s Leaderboard',
-          'weight':'Average Waste/Month'
-        }"/>
-        </div>
+      </div>
+    </div>
     </div>
 </div>
 </template>

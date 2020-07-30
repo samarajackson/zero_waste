@@ -8,13 +8,13 @@
     <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
             <div v-if="$store.state.userid==null" class="row">
-              <b-nav-item><router-link to="/">Leaderboard</router-link></b-nav-item>
-              <b-nav-item><router-link to="/login">Login</router-link></b-nav-item>
+              <b-nav-item><router-link to="/" class='nav-link'>Leaderboard</router-link></b-nav-item>
+              <b-nav-item><router-link to="/login" class='nav-link'>Login</router-link></b-nav-item>
             </div>
             <div v-else class="row">
-                <b-nav-item><router-link to="/takeout">Take out the Trash</router-link></b-nav-item>
-                <b-nav-item><router-link to='/dashboard'>My Dashboard</router-link></b-nav-item>
-                <b-nav-item @click="logout">Logout</b-nav-item>
+                <b-nav-item><router-link to="/takeout" class='nav-link'>Take out the Trash</router-link></b-nav-item>
+                <b-nav-item><router-link to='/dashboard' class='nav-link'>My Dashboard</router-link></b-nav-item>
+                <b-nav-item><a @click="logout" class='nav-link'>Logout</a></b-nav-item>
             </div>
         </b-navbar-nav>
     </b-collapse>
@@ -23,13 +23,16 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   methods: {
-    logout () {
-      this.$store.commit('changeid', null)
-      this.$store.commit('updateuser', null)
-      this.$cookies.remove('userid')
-      this.$router.replace({ path: '/' })
+    async logout () {
+      await axios.get('logout').then((response) => {
+        this.$store.commit('changeid', null)
+        this.$store.commit('updateuser', null)
+        this.$cookies.set('loggedin', false)
+        this.$router.replace({path: '/'})
+      })
     }
   }
 }
