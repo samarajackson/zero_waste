@@ -16,3 +16,4 @@ class CorsMiddleware(object):
         # Code to be executed for each request/response after
         # the view is called.
         return self.process_response(response)
+
