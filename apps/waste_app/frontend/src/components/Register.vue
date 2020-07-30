@@ -1,7 +1,7 @@
 <template>
 <div class="container pt-3">
     <h1>Register for TrashTrack</h1>
-    <b-form @submit="register">
+    <b-form @submit.prevent="register">
         <input type="hidden" name="_token" :value="csrf">
         <b-form-group id="first-group"
             label="First Name"
@@ -121,15 +121,17 @@ export default {
     async register (data) {
       this.errors = {}
       axios.post('user/', this.user).then((response) => {
+        console.log("then executed:");
         this.$router.replace({ path: './../dashboard' })
       })
-        .catch(error => {
-          this.errors = error.response.data
-        })
+      .catch(error => {
+        console.log("got an error:" + error);
+        this.errors = error.response.data
+      })
     }
   },
   mounted () {
-    this.csrf = window.laravel.csrfToken
+    // this.csrf = window.laravel.csrfToken
   }
 }
 </script>

@@ -5,16 +5,18 @@
         <img src="../../static/coldel.png" alt="Trash Icon" height=80 class="pb-2">
         <p class="lead">Fill out the fields below, or select "Zero Waste" to record your week as trash-free!</p>
         <div class="col-lg align-self-center">
-            <a href="../zero_waste" class="btn btn-success">Zero Waste Week!</a>
+            <a @click="zero" class="btn btn-success">Zero Waste Week!</a>
         </div>
     </div>
     <div class="container pt-3">
         <h1></h1>
         <b-form @submit="trash">
-            <!-- <input type="hidden" name="_token" :value="csrf"> -->
-            <b-form-group id="bag_size-group"
-                label="How big is your bag?"
-                label-for="bag_size"
+            <input type="hidden" name="csrfmiddlewaretoken" :value="csrf">
+            <b-form-group 
+              id="bag_size-group"
+              label="How big is your bag?"
+              label-for="bag_size"
+              label-cols="4" label-cols-lg="3"
             >
             <b-form-select
                 id ="bag_size"
@@ -30,6 +32,7 @@
              <b-form-group id="fullness-group"
                 label="How full is your bag?"
                 label-for="fullness"
+                label-cols="4" label-cols-lg="3"
             >
             <b-form-select
                 id ="fullness"
@@ -45,12 +48,12 @@
             <b-form-group id="takeout_date-group"
                 label="When did you throw it out?"
                 label-for="takeout_date"
+                label-cols="4" label-cols-lg="3"
             >
             <b-form-input
                 id ="takeout_date"
                 v-model="trashtest.takeout_date"
                 type="date"
-                :value = now
             ></b-form-input>
             <b-form-text  v-if="errors.takeout_date">
                 <div v-for="error in errors.bday" :key="error">
@@ -69,9 +72,12 @@ export default {
   data () {
     return {
       user: {},
-      csrf: '',
       errors: {},
-      trashtest: {},
+      trashtest: {
+        bag_size: 13,
+        fullness: 1
+      },
+      csrf: '',
       bagOptions: [
         { value: 4, text: 'Small (4gal)' },
         { value: 13, text: 'Tall Kitchen (13gal)', selected: true },
@@ -87,30 +93,57 @@ export default {
         4: 4,
         13: 15,
         30: 25
-      },
-      now: ''
+      }
     }
   },
   methods: {
     async trash () {
       this.trashtest.weight = this.trashtest.fullness * (this.weightdict[this.trashtest.bag_size])
       this.trashtest.trashtype = 'Trashbag'
-      axios.create({ withCredentials: true }).post('trashtest/', this.trashtest).then((response) => {
-        this.$router.replace({ path: './../dashboard' })
-      })
-        .catch(error => {
+      axios.create({ withCredentials: true
+      }).post('trashtest/', this.trashtest)
+      .then((response) => {
+        console.log(response.data)
+        this.$router.replace({ path: './dashboard' }) 
+      }).catch(error => {
           this.errors = error.response.data
+          console.log('there were errors')
         })
+    },
+    async zero () {
+      this.trashtest.weight = 0
+      this.trashtest.trashtype = 'Zero Waste'
+      this.trashtest.bag_size = 0
+      this.trashtest.fullness = 0
+      axios.create({ withCredentials: true,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false,
+          requestCert: true,
+          keepAlive: true })
+      }).post('trashtest/', this.trashtest)
+      .then((response) => {
+        if (response.data.errors) {
+          this.errors = response.data.errors
+          console.log('there were errors')
+        }
+        else{
+          this.$router.replace({ path: './dashboard' })
+        }
+      })
     }
   },
-  mounted () {
-    this.csrf = window.laravel.csrfToken
+  beforeMount () {
+    // this.csrf = window.laravel.csrfToken
+    // getting the current date to set the v-model to today by default (most likely the trash will be the same day)
     const today = new Date()
     const dd = String(today.getDate()).padStart(2, '0')
     const mm = String(today.getMonth() + 1).padStart(2, '0')
     const yyyy = today.getFullYear()
-    this.now = mm + '-' + dd + '-' + yyyy
-    console.log('date is ' + this.now)
+    this.trashtest.takeout_date = yyyy + '-' + mm + '-' + dd
+    // now to set the csrf token from Django
+    // axios.get('getcsrf').then((response) => {
+    //   this.csrf = response.data.token
+    // })
   }
 }
 </script>
