@@ -34,11 +34,11 @@
             {{errors.pw}}
         </b-form-text>
         </b-form-group>
-        <b-button type="submit">Submit</b-button>
+        <b-button type="submit" class='btn btn-info'>Login</b-button>
     </b-form>
     <div class="pt-4">
         <h4>Don't have an account? No problem!</h4>
-        <b-button router-link to="/register">Register Here</b-button>
+        <b-button router-link to="/register">Register</b-button>
     </div>
     </div>
 </div>
