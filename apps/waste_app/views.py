@@ -14,6 +14,7 @@ from .serializers import UserSerializer, TrashSerializer
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.middleware.csrf import get_token
+from django.contrib.auth import authenticate, login
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -148,28 +149,37 @@ def login(request):
     This endpoint handles a login from the login page.
     """
     data = request.data
-    email = data['email']
+    username = data['email']
+    password = data['password']
     context = {}
-    if User.objects.filter(email=email):
-        user = User.objects.get(email=email)
-        if bcrypt.checkpw(data['pw'].encode(), user.pw.encode()):
-            request.session["userid"] = user.id
-            request.session.modified = True
-            request.user = user
-            context = {
-                "userid": user.id,
-                "user": { 'first': user.first, 'username': user.username, 'id': user.id }
-            }
-        else:
-            context = {
-                "errors": {"pw": "Password is incorrect."}
-            }
-    else:
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        login(request, user)
         context = {
-            "errors": {"email": "There is no account with that email address."}
+            "user": { 'first': user.first, 'username': user.username, 'id': user.id }
         }
+    else:
+        context= {"errors": {'email':"Invalid Credentials"}}
+    # if User.objects.filter(email=email):
+    #     user = User.objects.get(email=email)
+    #     if bcrypt.checkpw(data['pw'].encode(), user.password.encode()):
+    #         request.session["userid"] = user.id
+    #         request.session.modified = True
+    #         request.user = user
+    #         context = {
+    #             "userid": user.id,
+    #             "user": { 'first': user.first, 'username': user.username, 'id': user.id }
+    #         }
+    #     else:
+    #         context = {
+    #             "errors": {"pw": "Password is incorrect."}
+    #         }
+    # else:
+    #     context = {
+    #         "errors": {"email": "There is no account with that email address."}
+    #     }
     request.session.set_test_cookie()
-    print(f"session after login: {request.session.items()}")
+    # print(f"session after login: {request.session.items()}")
     return Response(context)
 
 def logout(request):

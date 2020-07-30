@@ -1,7 +1,7 @@
 <template>
 <div class="container pt-3">
     <h1>Register for TrashTrack</h1>
-    <b-form @submit="register">
+    <b-form @submit.prevent="register">
         <input type="hidden" name="_token" :value="csrf">
         <b-form-group id="first-group"
             label="First Name"

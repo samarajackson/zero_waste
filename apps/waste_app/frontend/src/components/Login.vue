@@ -5,7 +5,7 @@
         <p class="lead">Track your waste production, compete with others, and earn achievements! Please log in below.</p>
     </div>
     <div class="container">
-    <b-form @submit="login">
+    <b-form @submit.prevent="login">
         <!-- <input type="hidden" name="_token" :value="csrf"> -->
         <b-form-group id="email-group"
             label="Email address"
