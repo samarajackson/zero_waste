@@ -8,8 +8,10 @@ from django.http import HttpResponse
 from apps.waste_app.models import User
 
 def get_user(request):
+    print('called get user')
     print(request.session.items())
     request.user = User.objects.get(id=request.session['userid'])
+    print('got user')
     return request.user
 
 def get_user(request):

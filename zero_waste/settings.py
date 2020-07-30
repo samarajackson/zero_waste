@@ -21,7 +21,7 @@ SECRET_KEY = '&yil-e1%f*3q2_ajxo9*8%9$fgq-isd^#qggbc%i@8_9))*p_b'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-AUTH_USER_MODEL = 'waste_app.User'
+
 ALLOWED_HOSTS = []
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = [
@@ -38,12 +38,7 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
     'content-type'
 ]
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ]
-}
+
 INSTALLED_APPS = [
     'apps.waste_app',
     'corsheaders',
@@ -65,7 +60,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
     # 'corsheaders.middleware.CorsPostCsrfMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # 'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     
     # 'apps.waste_app.middleware.MyAuthenticationMiddleware',
