@@ -6,7 +6,7 @@ cffi==1.13.2
 decorator==4.4.1
 Django==3.0.8
 django-crispy-forms==1.8.0
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 ipython==7.9.0
 ipython-genutils==0.2.0
 jedi==0.15.1
